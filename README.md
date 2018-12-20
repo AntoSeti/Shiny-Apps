@@ -8,8 +8,8 @@ Ce dashboard a été réalisé grâce au logiciel R et aux packages suivants : s
 https://antoinesetif.shinyapps.io/ProjetFFT/
 
 ## Projet Betting
-L'idée de ce projet est de synthétiser un ensemble important de données .csv liés aux résultats de paris sportifs (issu de divers sites internets, principalement blogabet) afin d'avoir le meilleur rendu visu. Les caractéristiques et indicateurs associés se mettent à jour en fonction des filtres sélectionnés.
+L'idée de ce projet est de synthétiser un ensemble important de données .csv liés aux résultats de paris sportifs (issu de divers sites internets, principalement blogabet) afin d'avoir le meilleur rendu visuel d'un suivi sur la période Mars 2018--Septembre 2018. Les caractéristiques et indicateurs associés se mettent à jour en fonction des filtres sélectionnés (par côte, tipster, sport, bookmaker...).
 
-Ce dashboard a été réalisé grâce au logiciel R et aux packages suivants : shiny, rAmCharts , dplyr, pipeR, readr , shinydashboard.
+Ce dashboard a été réalisé grâce au logiciel R et aux packages suivants : shiny, rAmCharts , dplyr, pipeR, readr, shinydashboard.
 
 https://antoinesetif.shinyapps.io/BettingProject_All/
