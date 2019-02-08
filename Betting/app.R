@@ -6,6 +6,7 @@ library(shinydashboard)
 library(dplyr)
 library(pipeR)
 library(readr)
+library(ggplot2)
 
 # setwd("~/Desktop/ProjetProno/BettingProject")
 
@@ -30,9 +31,9 @@ Aout2018$Date <- as.POSIXct(as.Date(Aout2018$Date, "%m/%d/%Y"))
 Sept2018<-read.csv2(file="Sept2018.csv", header = TRUE, sep = ";", dec = ".")
 Sept2018$Date <- as.POSIXct(as.Date(Sept2018$Date, "%d/%m/%Y"))
 
-An2018_1 <- rbind(Sept2018,Aout2018,Juillet2018,Juin2018,Mai2018,Avril2018,Mars2018)
+An2018 <- rbind(Sept2018,Aout2018,Juillet2018,Juin2018,Mai2018,Avril2018,Mars2018)
 
-An2018<-read.csv2(file="Antoine.csv", header = TRUE, sep = ";", dec = ".")
+#An2018<-read.csv2(file="Antoine.csv", header = TRUE, sep = ";", dec = ".")
 An2018$Date <- as.POSIXct(as.Date(An2018$Date, "%d/%m/%Y"))
 
 ui <- dashboardPage(
@@ -43,7 +44,10 @@ ui <- dashboardPage(
       menuItem("Vue générale", tabName = "tabgeneral", icon = icon("dashboard")),
       menuItem("Par Sport", tabName = "tabsport", icon = icon("calendar")),
       menuItem("Par Tipster", tabName = "tabtipster", icon = icon("credit-card")),
-      menuItem("Par Bookmakmer", tabName = "tabbook", icon = icon("thumbs-up"))
+      menuItem("Par Bookmaker", tabName = "tabbook", icon = icon("thumbs-up")),
+      menuItem("Visualisation données 1", tabName = "tabvue", icon = icon("table")),
+      menuItem("Visualisation données 2", tabName = "tabvue2", icon = icon("app-store")),
+      menuItem("A propos", tabName = "infos", icon = icon("question-circle"))
     )
   ),
   ## Body content
@@ -61,7 +65,7 @@ ui <- dashboardPage(
                                  min = "2007-01-01", max = "2020-07-31", separator = "-")
                   ),
                   column(6,
-                  sliderInput("rangecote", strong("Veuillez choisir un intervalle de cote"), step=1,
+                  sliderInput("rangecote", strong("Veuillez choisir un intervalle de côte"), step=1,
                               min = 1, max = 200,
                               value = c(1,200))
                   )
@@ -238,9 +242,66 @@ ui <- dashboardPage(
                 valueBoxOutput("RoiBookBox"),
                 valueBoxOutput("CoteMoyBookBox")
               )
+      ),
+      tabItem(tabName = "tabvue",
+              titlePanel("Visualisation données (par filtres)"),
+              fluidRow(
+                column(4,
+                       selectInput("sport11",
+                                   "Sport :",
+                                   c("All",
+                                     unique(as.character(An2018$Sport))))
+                ),
+                column(4,
+                       selectInput("book11",
+                                   "Bookmaker :",
+                                   c("All",
+                                     unique(as.character(An2018$Bookmaker))))
+                ),
+                column(4,
+                       selectInput("tipster11",
+                                   "Tipster :",
+                                   c("All",
+                                     unique(as.character(An2018$Tipster))))
+                )
+              ),
+              DT::dataTableOutput("table11")
+      ),
+      tabItem(tabName = "tabvue2",
+              titlePanel("Visualisation données (Choix colonnes)"),
+              sidebarLayout(
+                sidebarPanel(
+                    checkboxGroupInput("show_vars", "Columns to show:",
+                                       names(An2018), selected = names(An2018))
+                ),
+                mainPanel(
+                 DT::dataTableOutput("mytable11")
+                )
+              )
+      ),
+      tabItem(tabName = "infos",
+              
+              fluidRow(
+                
+                column(width = 12,
+                       
+                       br(),     
+                       
+                       h4("L'idée de ce projet est de synthétiser un ensemble important de données .csv liés aux résultats de paris sportifs (issu de divers sites internets) afin d'avoir le meilleur rendu visuel d'un suivi sur la période Mars 2018--Septembre 2018. Les caractéristiques et indicateurs associés se mettent à jour en fonction des filtres sélectionnés (par côte, tipster, sport, bookmaker...).",
+
+                       br(),
+                       
+                       h4("Ce dashboard a été réalisé grâce au logiciel ", a("R", href = "https://www.r-project.org/", target="_blank"), " et aux packages suivants : ", strong("shiny"), ",", strong("rAmCharts"), ",", strong("dplyr"),",", strong("pipeR"),",", strong("readr"),",", strong("shinydashboard"),".")
+                       
+                       
+                )
+                
+              )
+              
       )
     )
   )
+)
 )
 
 
@@ -699,7 +760,26 @@ server <- function(input, output) {
     )
   })
   
+  output$table11 <- DT::renderDataTable(DT::datatable({
+    data <- An2018
+    if (input$sport11 != "All") {
+      data <- data[data$Sport == input$sport11,]
+    }
+    if (input$book11 != "All") {
+      data <- data[data$Bookmaker == input$book11,]
+    }
+    if (input$tipster11 != "All") {
+      data <- data[data$Tipster == input$tipster11,]
+    }
+    data
+  }))
+  
+  output$mytable11 <- DT::renderDataTable({
+    DT::datatable(An2018[, input$show_vars, drop = FALSE], options = list(orderClasses = TRUE, searching = FALSE, lengthMenu = c(10, 20, 30), lengthMenu=15))
+  })
 }
 
 
 shinyApp(ui, server)
+
+# runGitHub("Shiny-Apps", "Twan76", subdir = "Betting")
